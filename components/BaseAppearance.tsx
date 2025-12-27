@@ -1,7 +1,7 @@
 import React from 'react';
 import { CharacterTraits } from '../types';
 import { Button } from './Button';
-// import { getBodyPartDescriptor } from '../services/geminiService'; // Moved locally or duplicated
+// import { getBodyPartDescriptor } from '../services/localService'; // Moved locally or duplicated
 import { HAIR_COLORS, SKIN_TONES, BODY_TYPES, BACKGROUND_COLORS, UNDERWEAR_COLORS, RENDER_STYLES, UNDERWEAR_STYLES, POSES } from '../constants';
 
 // Helper duplicated from service or imported if exported from localService
