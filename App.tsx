@@ -7,6 +7,7 @@ import { ZoomableImage } from './components/ZoomableImage';
 import { EyeIcon, EyeSlashIcon } from './components/Icons';
 import { BaseAppearance } from './components/BaseAppearance';
 import { PromptDesigner } from './components/PromptDesigner';
+import { ConnectionStatus } from './components/ConnectionStatus';
 import { LOCAL_STORAGE_KEY, DEFAULT_TRAITS } from './constants';
 
 const App: React.FC = () => {
@@ -301,6 +302,7 @@ const App: React.FC = () => {
 
   return (
     <div className="h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 selection:bg-indigo-500 selection:text-white flex flex-col overflow-hidden">
+      <ConnectionStatus settings={{ comfyUrl: import.meta.env.VITE_COMFY_API_URL || 'http://127.0.0.1:8188', lmStudioUrl: import.meta.env.VITE_LM_STUDIO_API_URL || 'http://localhost:1234/v1', useRefiner: false }} />
       {/* Header */}
       <header className="border-b border-slate-700 bg-slate-900/50 backdrop-blur-md flex-shrink-0 z-50">
         <div className="max-w-[1920px] mx-auto px-4 h-14 flex items-center justify-between">
