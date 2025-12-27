@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { generateOutfitChange, generateBaseModel, enhancePrompt, constructOutfitPrompt, constructBasePrompt, analyzeImage } from './services/geminiService';
+import { generateOutfitChange, generateBaseModel, enhancePrompt, analyzeImage } from './services/localService';
 import { OutfitPreset, GenerationStatus, SavedOutfit, CharacterTraits } from './types';
 import { Button } from './components/Button';
 import { Spinner } from './components/Spinner';
@@ -120,8 +120,8 @@ const App: React.FC = () => {
     } catch (err: any) {
       handleError(err);
       // If error, we don't update originalImage, keeping the old one
-      const debugPrompt = constructBasePrompt(traitsToUse, false);
-      setFailedPrompt(debugPrompt);
+      // const debugPrompt = constructBasePrompt(traitsToUse, false);
+      // setFailedPrompt(debugPrompt);
     } finally {
       setIsGeneratingBase(false);
     }
@@ -152,8 +152,8 @@ const App: React.FC = () => {
     } catch (err: any) {
       setStatus(GenerationStatus.ERROR);
       handleError(err);
-      const debugPrompt = constructOutfitPrompt(prompt, traits, scene, false);
-      setFailedPrompt(debugPrompt);
+      // const debugPrompt = constructOutfitPrompt(prompt, traits, scene, false);
+      // setFailedPrompt(debugPrompt);
     }
   };
 
@@ -311,15 +311,7 @@ const App: React.FC = () => {
             </h1>
           </div>
           <div className="flex items-center gap-4 text-xs text-slate-400 hidden sm:flex">
-             <span>Powered by Gemini</span>
-             {/* Key Reset Button */}
-             <button 
-                onClick={handleSelectKey} 
-                className="text-slate-500 hover:text-white transition-colors"
-                title="Change API Key"
-             >
-                Change Key
-             </button>
+             <span>Powered by Local AI</span>
           </div>
         </div>
       </header>
