@@ -5,11 +5,15 @@ export class LmStudioClient {
       this.apiUrl = apiUrl.replace(/\/$/, "");
     }
 
-    async chatCompletion(messages: any[], model?: string): Promise<string> {
+    async chat(messages: any[], temperature: number = 0.7): Promise<string> {
+      return this.chatCompletion(messages, undefined, temperature);
+    }
+
+    async chatCompletion(messages: any[], model?: string, temperature: number = 0.7): Promise<string> {
       const payload = {
         messages: messages,
         model: model || "local-model", // LM Studio often ignores this or uses the loaded model
-        temperature: 0.7,
+        temperature: temperature,
         max_tokens: -1,
         stream: false
       };
