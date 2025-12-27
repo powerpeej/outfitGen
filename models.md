@@ -1,46 +1,59 @@
-# Required Models for Z-Image Workflows (RTX 2070 8GB Optimized)
+# Required Models for OutfitGenie (RTX 2070 8GB Optimized)
 
-This guide is optimized for an **NVIDIA RTX 2070 (8GB VRAM)**. Using the standard BF16 models (~19GB total) would cause severe performance issues due to system RAM offloading.
+This guide is optimized for an **NVIDIA RTX 2070 (8GB VRAM)**.
 
-**Recommendation: Use GGUF Quantized Models.** This reduces VRAM usage significantly while maintaining good quality.
-
-## 1. Primary Recommendation: GGUF Models (Fast & Efficient)
-
-These models fit comfortably within 8GB VRAM when offloaded smartly, or entirely if using lower quantizations.
-
-### Required Custom Nodes
-**You must install this custom node in ComfyUI for these models to work:**
-*   **ComfyUI-GGUF**: [https://github.com/city96/ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF)
-    *   *Install via ComfyUI Manager or `git clone` into `custom_nodes/`.*
-
-### Model Downloads
-
-| Component | Model Name | Size | Download Link | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| **Diffusion Model** | `z_image_turbo-Q5_K_M.gguf` | ~5.5 GB | [Download](https://huggingface.co/jayn7/Z-Image-Turbo-GGUF/resolve/main/z_image_turbo-Q5_K_M.gguf) | **Best Balance.** Place in `ComfyUI/models/diffusion_models/` |
-| | `z_image_turbo-Q8_0.gguf` | ~7.2 GB | [Download](https://huggingface.co/jayn7/Z-Image-Turbo-GGUF/resolve/main/z_image_turbo-Q8_0.gguf) | Higher quality, but tighter on VRAM. |
-| **Text Encoder** | `Qwen3-4B-Q4_K_M.gguf` | ~2.5 GB | [Download Folder](https://huggingface.co/unsloth/Qwen3-4B-GGUF/tree/main) | Pick `Q4_K_M` or `Q5_K_M`. Place in `ComfyUI/models/text_encoders/` |
-| **VAE** | `ae.safetensors` | ~335 MB | [Download](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors) | Standard Flux VAE. Place in `ComfyUI/models/vae/` |
-
-### Workflow Configuration
-The standard workflows included in this app (`z_image_t2i_api.json`) are configured for `safetensors` files. To use GGUF models:
-
-1.  **Download the GGUF Workflow**: [example_workflow.json](https://huggingface.co/jayn7/Z-Image-Turbo-GGUF/resolve/main/example_workflow.json)
-2.  Open this workflow in ComfyUI.
-3.  Ensure the `UnetLoaderGGUF` node (from ComfyUI-GGUF) is selected and points to your downloaded `.gguf` file.
-4.  Ensure the `CLIPLoader` (or DualCLIPLoader) points to the `Qwen3` GGUF text encoder.
+**Strategy:** We use **GGUF Quantized Models** for image generation. This allows the massive Z-Image model (~19GB original size) to fit entirely within your 6-7GB of available VRAM, leaving just enough room for the system.
 
 ---
 
-## 2. Alternative: Original BF16 Models (High VRAM)
+## 1. Image Generation Models (ComfyUI)
 
-**⚠️ NOT Recommended for 8GB VRAM**
-Running these will force ComfyUI to offload to system RAM, resulting in very slow generation times (potentially minutes per image).
+These models are required for the `Z-Image GGUF` workflows (both Text-to-Image and Outfit Changing).
 
-*   **Launch Argument**: You must run ComfyUI with `--lowvram`.
+### 🛠️ Required Custom Nodes
+**You must install this custom node in ComfyUI for these models to work:**
+*   **ComfyUI-GGUF**: [https://github.com/city96/ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF)
+    *   *How to install:* Open ComfyUI Manager -> "Install Custom Nodes" -> Search "GGUF" -> Install "ComfyUI-GGUF".
 
-| Component | Filename | Size | Link |
+### 📥 Model Downloads
+
+| Component | Model Name | Size | Download Link | Destination Folder |
+| :--- | :--- | :--- | :--- | :--- |
+| **Diffusion Model** | `z_image_turbo-q3_k_s.gguf` | **3.8 GB** | [Download](https://huggingface.co/gguf-org/z-image-gguf/resolve/main/z-image-turbo-q3_k_s.gguf) | `ComfyUI/models/diffusion_models/` |
+| **Text Encoder** | `Qwen3-4B-Q4_K_M.gguf` | **2.5 GB** | [Download](https://huggingface.co/unsloth/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4_K_M.gguf) | `ComfyUI/models/text_encoders/` |
+| **VAE** | `ae.safetensors` | **335 MB** | [Download](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors) | `ComfyUI/models/vae/` |
+
+> **Note:** We use the `Q3_K_S` version (3.8GB) because it is the **only** version that leaves enough VRAM for the Text Encoder (2.5GB) + VAE + System Overhead on an 8GB card.
+
+---
+
+## 2. Text & Vision Models (LM Studio)
+
+For describing outfits and chatting, we need a "smart" model that doesn't steal VRAM from the image generator.
+
+### ⚙️ Configuration
+*   **Key Setting:** In LM Studio, ensure **"GPU Offload"** is set to **"Split"** or partially reduced if you experience crashes.
+*   Ideally, let this model run mostly in **System RAM** (DDR4/DDR5) so your **VRAM** (GDDR6) is free for ComfyUI.
+
+### 📥 Recommended Model
+
+| Model Name | Variant | Size | Notes |
 | :--- | :--- | :--- | :--- |
-| Text Encoder | `qwen_3_4b.safetensors` | 6.8 GB | [Link](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors) |
-| Diffusion | `z_image_turbo_bf16.safetensors` | 11.5 GB | [Link](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors) |
-| VAE | `ae.safetensors` | 335 MB | [Link](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors) |
+| **Llama 3.1 8B Instruct** | `Q4_K_M.gguf` | ~4.9 GB | Industry standard. Great at fashion descriptions. |
+| **Phi-3.5 Mini Instruct** | `Q4_K_M.gguf` | ~2.4 GB | Faster alternative if Llama 3 is too heavy for your system RAM. |
+
+---
+
+## 3. Workflow Usage
+
+### Text-to-Image (New Outfit Base)
+*   **File:** `z_image_t2i_gguf_api.json`
+*   **Usage:** Generates a full image from a text prompt.
+*   **Speed:** Expect **10-20 seconds** per image (faster than the 50s+ of the old setup).
+
+### Image-to-Image (Outfit Change)
+*   **File:** `z_image_i2i_gguf_api.json`
+*   **Usage:**
+    1.  Provide an input image (e.g., a photo of a person).
+    2.  Provide a **Mask** (white pixels = area to change/outfit, black = keep).
+    3.  The workflow uses `VAEEncodeForInpaint` to seamlessly replace the masked area with the new prompt description.
