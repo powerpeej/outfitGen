@@ -1,21 +1,22 @@
 import React from 'react';
 import { OutfitPreset, GenerationStatus } from '../types';
-import { CATEGORIES, SCENES, PRESETS } from '../constants';
-import { Spinner } from './Spinner';
+import { Button } from './Button';
+import { MagicWandIcon } from './Icons';
+import { SCENES, CATEGORIES, PRESETS } from '../constants';
 
 interface PromptDesignerProps {
   prompt: string;
-  setPrompt: React.Dispatch<React.SetStateAction<string>>;
+  setPrompt: (val: string) => void;
   handleEnhancePrompt: () => void;
   isEnhancing: boolean;
   handleTransparency: () => void;
   handleRandomize: () => void;
   scene: string;
-  setScene: (scene: string) => void;
+  setScene: (val: string) => void;
   selectedCategory: string;
-  setSelectedCategory: (cat: string) => void;
+  setSelectedCategory: (val: string) => void;
   selectedPresetId: string | null;
-  setSelectedPresetId: (id: string | null) => void;
+  setSelectedPresetId: (val: string | null) => void;
   applyPreset: (preset: OutfitPreset) => void;
   handleVariationClick: (type: 'color' | 'material' | 'style', value: string) => void;
   errorMsg: string | null;
@@ -50,182 +51,215 @@ export const PromptDesigner: React.FC<PromptDesignerProps> = ({
   generatedImage,
   handleSaveOutfit
 }) => {
-  const filteredPresets = selectedCategory === 'All'
-    ? PRESETS
+
+  const activePreset = PRESETS.find(p => p.id === selectedPresetId);
+  const filteredPresets = selectedCategory === 'All' 
+    ? PRESETS 
     : PRESETS.filter(p => p.category === selectedCategory);
 
-  const currentPreset = PRESETS.find(p => p.id === selectedPresetId);
-
   return (
-    <div className="flex-1 flex flex-col gap-4 min-h-0">
-       {/* Prompt Input Area */}
-       <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex-shrink-0">
-          <h2 className="text-sm font-bold text-slate-300 uppercase tracking-wider mb-2 flex justify-between items-center">
-             <div className="flex items-center gap-2">
-                <span>✨</span> Outfit Designer
-             </div>
-             <div className="flex gap-2">
-                 <button
-                    onClick={handleRandomize}
-                    className="text-[10px] bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition-colors"
-                    title="Randomize Parameters"
-                 >
-                    🎲 Random
-                 </button>
-                 <button
-                    onClick={handleTransparency}
-                    className="text-[10px] bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-slate-300 transition-colors"
-                    title="Add Transparency/Sheer Effects"
-                 >
-                    👻 Sheer
-                 </button>
-             </div>
-          </h2>
+    <div className="bg-slate-800 rounded-xl p-5 border border-slate-700 shadow-lg">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-sm font-bold text-white flex items-center gap-2 uppercase tracking-wide">
+          <span>🪄</span> Prompt
+        </h2>
+        <div className="flex gap-2">
+          <button
+            onClick={handleTransparency}
+            className="text-[10px] flex items-center gap-1 bg-slate-700 hover:bg-slate-600 text-cyan-300 px-2 py-1 rounded-full transition-colors border border-slate-600"
+            title="Make outfit transparent"
+          >
+            <span>💧</span> Clear
+          </button>
+          <button
+            onClick={handleRandomize}
+            className="text-[10px] flex items-center gap-1 bg-slate-700 hover:bg-slate-600 text-indigo-300 px-2 py-1 rounded-full transition-colors border border-slate-600"
+          >
+            <span>🎲</span> Randomize
+          </button>
+        </div>
+      </div>
+      
+      <div className="space-y-3">
+        <div className="relative">
+          <textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Describe the outfit..."
+            rows={3}
+            className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 pr-10 text-sm focus:ring-1 focus:ring-indigo-500 outline-none resize-none text-white placeholder-slate-500"
+          />
+          <button 
+            onClick={handleEnhancePrompt}
+            disabled={isEnhancing || !prompt.trim()}
+            className="absolute bottom-2 right-2 p-1.5 text-indigo-400 hover:text-white hover:bg-indigo-600 rounded-md transition-all disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-indigo-400"
+            title="Magic Wand: Enhance Prompt with AI"
+          >
+            {isEnhancing ? (
+              <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <MagicWandIcon />
+            )}
+          </button>
+        </div>
 
-          <div className="relative">
-             <textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Describe the outfit in detail (e.g. A futuristic white bodysuit made of latex...)"
-                className="w-full h-24 bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white focus:ring-2 focus:ring-indigo-500 outline-none resize-none custom-scrollbar"
-             />
-             <button
-               onClick={handleEnhancePrompt}
-               disabled={isEnhancing || !prompt.trim()}
-               className="absolute bottom-2 right-2 text-[10px] bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 px-2 py-1 rounded transition-all backdrop-blur-sm flex items-center gap-1"
-             >
-                {isEnhancing ? <Spinner /> : '✨ Enhance'}
-             </button>
-          </div>
+          {/* Scene Selection */}
+          <div>
+            <label className="block text-[10px] font-medium text-slate-400 uppercase mb-1">Scene / Background</label>
+            <select 
+              value={scene}
+              onChange={(e) => setScene(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-600 rounded-md py-1.5 px-2 text-xs text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none"
+            >
+              {SCENES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+        </div>
 
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1 custom-scrollbar">
-              {SCENES.map(s => (
-                  <button
-                    key={s}
-                    onClick={() => setScene(s)}
-                    className={`whitespace-nowrap px-3 py-1 rounded-full text-[10px] border transition-colors ${scene === s ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-500'}`}
-                  >
-                      {s}
-                  </button>
-              ))}
-          </div>
-       </div>
+        {/* Categories */}
+        <div className="flex gap-2 overflow-x-auto pb-1 custom-scrollbar -mx-1 px-1">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`text-[10px] px-3 py-1 rounded-full whitespace-nowrap transition-colors border ${
+                selectedCategory === cat
+                  ? 'bg-indigo-600 border-indigo-500 text-white'
+                  : 'bg-slate-700/50 border-slate-600 text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
 
-       {/* Presets & Variations */}
-       <div className="flex-1 bg-slate-800/50 rounded-xl border border-slate-700 flex flex-col min-h-0 overflow-hidden">
-          {/* Category Tabs */}
-          <div className="flex border-b border-slate-700 overflow-x-auto custom-scrollbar">
-             {CATEGORIES.map(cat => (
-                 <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-4 py-3 text-xs font-medium whitespace-nowrap transition-colors border-b-2 ${selectedCategory === cat ? 'border-indigo-500 text-white bg-slate-800' : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'}`}
-                 >
-                    {cat}
-                 </button>
-             ))}
-          </div>
+        {/* Preset List */}
+        <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+          {filteredPresets.map(preset => (
+            <button
+              key={preset.id}
+              onClick={() => applyPreset(preset)}
+              className={`flex-shrink-0 border rounded-lg px-3 py-1.5 flex items-center gap-2 transition-all text-xs ${
+                selectedPresetId === preset.id 
+                ? 'bg-indigo-600/20 border-indigo-500 text-indigo-200' 
+                : 'bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-300 hover:text-white'
+              }`}
+              title={preset.name}
+            >
+              <span>{preset.icon}</span>
+              <span>{preset.name}</span>
+            </button>
+          ))}
+          {filteredPresets.length === 0 && (
+            <div className="text-xs text-slate-500 italic p-2">No presets in this category.</div>
+          )}
+        </div>
 
-          <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-             {/* Presets Grid */}
-             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2">
-                 {filteredPresets.map(preset => (
-                     <button
-                        key={preset.id}
-                        onClick={() => applyPreset(preset)}
-                        className={`text-left p-2 rounded-lg border transition-all hover:shadow-lg group flex flex-col gap-1 ${selectedPresetId === preset.id ? 'bg-indigo-900/30 border-indigo-500 ring-1 ring-indigo-500' : 'bg-slate-900 border-slate-700 hover:border-slate-500'}`}
-                     >
-                        <div className="flex items-center justify-between">
-                            <span className="text-lg">{preset.icon}</span>
-                            {selectedPresetId === preset.id && <span className="text-[10px] text-indigo-400 font-bold">✓</span>}
-                        </div>
-                        <span className="text-[10px] font-medium text-slate-300 group-hover:text-white truncate w-full">{preset.name}</span>
-                     </button>
-                 ))}
-             </div>
-
-             {/* Variations Panel (Only shows when a preset is selected) */}
-             {currentPreset && (
-                 <div className="mt-4 pt-4 border-t border-slate-700 space-y-3 animate-in fade-in slide-in-from-bottom-2">
-                     <h3 className="text-xs font-bold text-slate-400 uppercase">Variations for {currentPreset.name}</h3>
-
-                     {currentPreset.colors && (
-                         <div className="space-y-1">
-                             <p className="text-[10px] text-slate-500">Colors</p>
-                             <div className="flex flex-wrap gap-1">
-                                 {currentPreset.colors.map(c => (
-                                     <button key={c} onClick={() => handleVariationClick('color', c)} className="px-2 py-0.5 rounded text-[10px] bg-slate-900 border border-slate-700 hover:border-indigo-500 hover:text-indigo-400 text-slate-400 transition-colors">{c}</button>
-                                 ))}
-                             </div>
-                         </div>
-                     )}
-
-                     {currentPreset.materials && (
-                         <div className="space-y-1">
-                             <p className="text-[10px] text-slate-500">Materials</p>
-                             <div className="flex flex-wrap gap-1">
-                                 {currentPreset.materials.map(m => (
-                                     <button key={m} onClick={() => handleVariationClick('material', m)} className="px-2 py-0.5 rounded text-[10px] bg-slate-900 border border-slate-700 hover:border-indigo-500 hover:text-indigo-400 text-slate-400 transition-colors">{m}</button>
-                                 ))}
-                             </div>
-                         </div>
-                     )}
-
-                     {currentPreset.styles && (
-                         <div className="space-y-1">
-                             <p className="text-[10px] text-slate-500">Styles</p>
-                             <div className="flex flex-wrap gap-1">
-                                 {currentPreset.styles.map(s => (
-                                     <button key={s} onClick={() => handleVariationClick('style', s)} className="px-2 py-0.5 rounded text-[10px] bg-slate-900 border border-slate-700 hover:border-indigo-500 hover:text-indigo-400 text-slate-400 transition-colors">{s}</button>
-                                 ))}
-                             </div>
-                         </div>
-                     )}
-                 </div>
-             )}
-          </div>
-
-          {/* Action Footer */}
-          <div className="p-4 bg-slate-800 border-t border-slate-700 space-y-3">
-             {errorMsg && (
-                 <div className="p-2 bg-red-500/10 border border-red-500/50 rounded text-[10px] text-red-200">
-                     {errorMsg}
-                 </div>
-             )}
-
-             {failedPrompt && (
-                 <div className="p-2 bg-orange-500/10 border border-orange-500/50 rounded text-[10px] text-orange-200 max-h-20 overflow-y-auto custom-scrollbar">
-                     <strong>Debug Prompt:</strong> {failedPrompt}
-                 </div>
-             )}
-
-             <button
-                onClick={handleGenerate}
-                disabled={!hasImage || !prompt || status === GenerationStatus.LOADING}
-                className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] flex justify-center items-center gap-2"
-             >
-                {status === GenerationStatus.LOADING ? (
-                    <>
-                        <Spinner />
-                        <span>Designing...</span>
-                    </>
-                ) : (
-                    <>
-                        <span>✨ Generate Outfit</span>
-                    </>
+        {/* Preset Variations (Dynamic Section) */}
+        {activePreset && (
+            <div className="bg-slate-700/30 rounded-lg p-3 border border-slate-600 animate-fade-in space-y-4">
+                <div className="flex justify-between items-center text-xs border-b border-slate-600/50 pb-2">
+                    <span className="font-semibold text-slate-300">Customize {activePreset.name}</span>
+                    <button onClick={() => setSelectedPresetId(null)} className="text-slate-500 hover:text-slate-300 px-2">Close</button>
+                </div>
+                
+                {/* Colors */}
+                {activePreset.colors && activePreset.colors.length > 0 && (
+                    <div>
+                      <div className="text-[10px] text-slate-500 uppercase font-medium mb-1.5">Color Palette</div>
+                      <div className="flex flex-wrap gap-1.5">
+                          {activePreset.colors.map(color => (
+                              <button
+                                  key={color}
+                                  onClick={() => handleVariationClick('color', color)}
+                                  className="text-[10px] px-2.5 py-1 bg-slate-800 hover:bg-indigo-600 border border-slate-600 rounded-md hover:border-indigo-500 transition-all text-slate-300 hover:text-white hover:shadow-lg hover:shadow-indigo-500/20"
+                              >
+                                  {color}
+                              </button>
+                          ))}
+                      </div>
+                    </div>
                 )}
-             </button>
 
-             {generatedImage && status === GenerationStatus.SUCCESS && (
-                 <button
-                    onClick={handleSaveOutfit}
-                    className="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide transition-colors"
-                 >
-                    💾 Save to Wardrobe
-                 </button>
-             )}
+                  {/* Materials */}
+                  {activePreset.materials && activePreset.materials.length > 0 && (
+                    <div>
+                      <div className="text-[10px] text-slate-500 uppercase font-medium mb-1.5">Material</div>
+                      <div className="flex flex-wrap gap-1.5">
+                          {activePreset.materials.map(mat => (
+                              <button
+                                  key={mat}
+                                  onClick={() => handleVariationClick('material', mat)}
+                                  className="text-[10px] px-2.5 py-1 bg-slate-800 hover:bg-pink-600 border border-slate-600 rounded-md hover:border-pink-500 transition-all text-slate-300 hover:text-white hover:shadow-lg hover:shadow-pink-500/20"
+                              >
+                                  {mat}
+                              </button>
+                          ))}
+                      </div>
+                    </div>
+                )}
+
+                {/* Styles */}
+                {activePreset.styles && activePreset.styles.length > 0 && (
+                    <div>
+                        <div className="text-[10px] text-slate-500 uppercase font-medium mb-1.5">Style Variant</div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {activePreset.styles.map(style => (
+                              <button
+                                  key={style}
+                                  onClick={() => handleVariationClick('style', style)}
+                                  className="text-[10px] px-2.5 py-1 bg-slate-800 hover:bg-cyan-600 border border-slate-600 rounded-md hover:border-cyan-500 transition-all text-slate-300 hover:text-white hover:shadow-lg hover:shadow-cyan-500/20"
+                              >
+                                  {style}
+                              </button>
+                          ))}
+                      </div>
+                    </div>
+                )}
+            </div>
+        )}
+
+          {errorMsg && (
+          <div className="bg-red-500/10 border border-red-500/50 text-red-200 text-xs p-3 rounded-lg animate-fade-in break-words">
+            <p className="font-bold mb-1">Error:</p>
+            {errorMsg}
+            {failedPrompt && (
+              <div className="mt-2 pt-2 border-t border-red-500/30">
+                <p className="font-bold mb-1 text-[10px] uppercase">Full Prompt Used:</p>
+                <div className="bg-black/30 p-2 rounded text-[10px] font-mono max-h-24 overflow-y-auto select-all text-slate-300">
+                  {failedPrompt}
+                </div>
+                <button 
+                  onClick={() => navigator.clipboard.writeText(failedPrompt)}
+                  className="mt-1 text-[10px] text-indigo-300 hover:text-white underline"
+                >
+                  Copy Prompt to Clipboard
+                </button>
+              </div>
+            )}
           </div>
-       </div>
+        )}
+
+        <div className="flex gap-3 pt-2">
+          <Button 
+            onClick={handleGenerate}
+            isLoading={status === GenerationStatus.LOADING}
+            disabled={!hasImage || !prompt.trim()}
+            className="flex-1"
+          >
+            Generate Outfit
+          </Button>
+          
+          {generatedImage && (
+            <Button 
+              variant="secondary"
+              onClick={handleSaveOutfit}
+              title="Save to Wardrobe"
+            >
+              ❤️ Save
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
