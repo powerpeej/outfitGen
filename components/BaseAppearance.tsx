@@ -1,8 +1,17 @@
 import React from 'react';
 import { CharacterTraits } from '../types';
 import { Button } from './Button';
-import { getBodyPartDescriptor } from '../services/geminiService';
+// import { getBodyPartDescriptor } from '../services/geminiService'; // Moved locally or duplicated
 import { HAIR_COLORS, SKIN_TONES, BODY_TYPES, BACKGROUND_COLORS, UNDERWEAR_COLORS, RENDER_STYLES, UNDERWEAR_STYLES, POSES } from '../constants';
+
+// Helper duplicated from service or imported if exported from localService
+const getBodyPartDescriptor = (value: number): string => {
+  if (value < 30) return "slender";
+  if (value < 50) return "toned";
+  if (value < 70) return "average";
+  if (value < 90) return "curvy";
+  return "voluptuous";
+};
 
 interface BaseAppearanceProps {
   traits: CharacterTraits;
