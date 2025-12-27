@@ -49,7 +49,7 @@ export const generateBaseModel = async (
   traits: CharacterTraits
 ): Promise<string> => {
     // 1. Load the T2I Workflow API Template
-    const response = await fetch('/workflows/z_image_t2i_api.json');
+    const response = await fetch('/workflows/z_image_t2i_gguf_api.json');
     if (!response.ok) throw new Error("Failed to load T2I workflow template");
     const workflowTemplate = await response.text(); // Get as text for replacement
 
@@ -95,7 +95,7 @@ export const generateOutfitChange = async (
     const imageName = await comfy.uploadImage(base64Image);
 
     // 2. Load the I2I Workflow API Template
-    const response = await fetch('/workflows/z_image_i2i_api.json');
+    const response = await fetch('/workflows/z_image_i2i_gguf_api.json');
     if (!response.ok) throw new Error("Failed to load I2I workflow template");
     const workflowTemplate = await response.text();
 
