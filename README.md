@@ -11,30 +11,30 @@ To run this application, you need the following local AI services running:
 You need a working installation of [ComfyUI](https://github.com/comfyanonymous/ComfyUI).
 
 **Required Models:**
-Download and place these models in your `ComfyUI/models/` directory:
+Download and place these models in your `ComfyUI/models/` directory structure as follows:
 
-*   **Checkpoints (`models/checkpoints/`):**
-    *   `z_image_turbo_bf16.safetensors` ([Download](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors)) - *Note: Place in `models/diffusion_models/` or `models/checkpoints/` depending on your ComfyUI version, usually `diffusion_models` for Z-Image.*
-*   **Text Encoders (`models/text_encoders/`):**
-    *   `qwen_3_4b.safetensors` ([Download](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors))
-*   **VAE (`models/vae/`):**
-    *   `ae.safetensors` ([Download](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors))
-*   **LoRA (`models/loras/`):**
-    *   `pixel_art_style_z_image_turbo.safetensors` (Optional, if you want specific styles)
+| File Name | Download Link | Target Directory |
+| :--- | :--- | :--- |
+| `z_image_turbo_bf16.safetensors` | [Download](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors) | `models/diffusion_models/` |
+| `qwen_3_4b.safetensors` | [Download](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors) | `models/text_encoders/` |
+| `ae.safetensors` | [Download](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors) | `models/vae/` |
+
+*Note: Ensure you are using a recent version of ComfyUI for Z-Image support.*
 
 **Setup:**
-1.  Start ComfyUI (usually at `http://127.0.0.1:8188`).
-2.  Ensure you have the required custom nodes installed. The app uses standard nodes + `ModelSamplingAuraFlow`. If missing, use ComfyUI Manager to install them.
+1.  **Update ComfyUI:** Ensure your ComfyUI is updated to the latest version to support `ModelSamplingAuraFlow` (native in recent versions).
+2.  **Start Server:** Start ComfyUI (default: `http://127.0.0.1:8188`).
+3.  **Cross-Origin:** If running on a different machine or IP, ensure you run ComfyUI with `--listen` and potentially `--enable-cors-header *`.
 
 ### 2. LM Studio (Text & Vision)
 
 You need [LM Studio](https://lmstudio.ai/) for prompt enhancement and image analysis.
 
 **Setup:**
-1.  Load a text model (e.g., Llama 3, Mistral) for prompt enhancement.
-2.  Load a **Vision-compatible model** (e.g., LLaVA, BakLLaVA) if you want to use the "Analyze Image" feature.
-3.  Start the Local Server in LM Studio (usually at `http://localhost:1234`).
-4.  Ensure "CORS" is enabled in LM Studio server settings (to allow browser requests).
+1.  **Text Model:** Load a text model (e.g., Llama 3, Mistral) for prompt enhancement.
+2.  **Vision Model:** Load a **Vision-compatible model** (e.g., LLaVA, BakLLaVA) if you want to use the "Analyze Image" feature.
+3.  **Start Server:** Start the Local Server in LM Studio (default: `http://localhost:1234`).
+4.  **CORS (Important):** You **MUST** enable "CORS" in the LM Studio server settings (right sidebar) to allow the web app to communicate with it.
 
 ## Installation & Running
 
@@ -43,10 +43,14 @@ You need [LM Studio](https://lmstudio.ai/) for prompt enhancement and image anal
     npm install
     ```
 
-2.  **Configuration (Optional):**
-    If your services are running on different ports, create a `.env.local` file:
+2.  **Configuration:**
+    Create a `.env.local` file in the root directory to point to your local services if they differ from defaults:
+
     ```env
+    # Default ComfyUI URL
     VITE_COMFY_API_URL=http://127.0.0.1:8188
+
+    # Default LM Studio URL (ensure /v1 is included)
     VITE_LM_STUDIO_API_URL=http://localhost:1234/v1
     ```
 
@@ -63,5 +67,6 @@ You need [LM Studio](https://lmstudio.ai/) for prompt enhancement and image anal
 
 ## Troubleshooting
 
-*   **CORS Errors:** Ensure LM Studio server has CORS enabled. ComfyUI usually handles local requests fine, but if you access from a different IP, check ComfyUI arguments (`--listen`).
-*   **Generation Failed:** Check the ComfyUI console for red error messages. You might be missing a model file or a custom node.
+*   **CORS Errors:** Ensure LM Studio server has CORS enabled. For ComfyUI, if accessing from a different device, check startup arguments.
+*   **"Model not found" in ComfyUI:** Verify you placed the `.safetensors` files in the exact directories listed above.
+*   **Generation Failed:** Check the ComfyUI console window for error messages. If a node is red, you might be missing a model or need to update ComfyUI.
