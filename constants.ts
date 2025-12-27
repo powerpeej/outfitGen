@@ -1,5 +1,4 @@
 import { OutfitPreset, CharacterTraits } from './types';
-import { getBodyPartDescriptor } from './services/geminiService';
 
 export const LOCAL_STORAGE_KEY = 'outfitGenie_wardrobe_v1';
 
