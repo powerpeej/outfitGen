@@ -30,11 +30,17 @@ Download and place these models in your `ComfyUI/models/` directory structure as
 
 You need [LM Studio](https://lmstudio.ai/) for prompt enhancement and image analysis.
 
+**Recommended Models:**
+*   **For Prompt Enhancement (Text):**
+    *   [Meta Llama 3 8B Instruct](https://huggingface.co/lmstudio-community/Meta-Llama-3-8B-Instruct-GGUF) - Excellent general purpose instruction following.
+*   **For Image Analysis (Vision):**
+    *   [MiniCPM-V 2.6](https://huggingface.co/lmstudio-community/MiniCPM-V-2_6-GGUF) - State-of-the-art efficiency for vision tasks (Requires LM Studio 0.3.0+).
+    *   [LLaVA Llama 3 8B](https://huggingface.co/xtuner/llava-llama-3-8b-v1_1-gguf) - Strong alternative based on Llama 3.
+
 **Setup:**
-1.  **Text Model:** Load a text model (e.g., Llama 3, Mistral) for prompt enhancement.
-2.  **Vision Model:** Load a **Vision-compatible model** (e.g., LLaVA, BakLLaVA) if you want to use the "Analyze Image" feature.
-3.  **Start Server:** Start the Local Server in LM Studio (default: `http://localhost:1234`).
-4.  **CORS (Important):** You **MUST** enable "CORS" in the LM Studio server settings (right sidebar) to allow the web app to communicate with it.
+1.  **Load Model:** Search for and download one of the recommended models above within LM Studio.
+2.  **Start Server:** Start the Local Server in LM Studio (default: `http://localhost:1234`).
+3.  **CORS (Important):** You **MUST** enable "CORS" in the LM Studio server settings (right sidebar) to allow the web app to communicate with it.
 
 ## Installation & Running
 
