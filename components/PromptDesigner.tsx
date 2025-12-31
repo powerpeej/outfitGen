@@ -86,6 +86,7 @@ export const PromptDesigner: React.FC<PromptDesignerProps> = ({
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Describe the outfit..."
+            aria-label="Outfit description"
             rows={3}
             className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 pr-10 text-sm focus:ring-1 focus:ring-indigo-500 outline-none resize-none text-white placeholder-slate-500"
           />
@@ -94,6 +95,8 @@ export const PromptDesigner: React.FC<PromptDesignerProps> = ({
             disabled={isEnhancing || !prompt.trim()}
             className="absolute bottom-2 right-2 p-1.5 text-indigo-400 hover:text-white hover:bg-indigo-600 rounded-md transition-all disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-indigo-400"
             title="Magic Wand: Enhance Prompt with AI"
+            aria-label="Enhance prompt with AI"
+            aria-busy={isEnhancing}
           >
             {isEnhancing ? (
               <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
