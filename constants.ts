@@ -1,4 +1,5 @@
 import { OutfitPreset, CharacterTraits } from './types';
+import { AppSettings } from './services/settings';
 
 export const LOCAL_STORAGE_KEY = 'outfitGenie_wardrobe_v1';
 
@@ -405,3 +406,9 @@ export const PRESETS: OutfitPreset[] = [
     styles: ['Classic', 'Mini', 'Gothic', 'Traditional', 'Cat Maid']
   }
 ];
+
+export const DEFAULT_SETTINGS: AppSettings = {
+  comfyUrl: 'http://127.0.0.1:8188',
+  lmStudioUrl: 'http://localhost:1234/v1',
+  useRefiner: false,
+};

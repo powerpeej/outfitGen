@@ -4,11 +4,14 @@ import { OutfitPreset, GenerationStatus, SavedOutfit, CharacterTraits } from './
 import { Button } from './components/Button';
 import { Spinner } from './components/Spinner';
 import { ZoomableImage } from './components/ZoomableImage';
-import { EyeIcon, EyeSlashIcon } from './components/Icons';
+import { EyeIcon, EyeSlashIcon, SettingsIcon } from './components/Icons';
 import { BaseAppearance } from './components/BaseAppearance';
 import { PromptDesigner } from './components/PromptDesigner';
 import { StatusIndicator } from './components/StatusIndicator';
-import { LOCAL_STORAGE_KEY, DEFAULT_TRAITS } from './constants';
+import { SettingsPanel } from './components/SettingsPanel';
+import { AppSettings } from './services/settings';
+import { loadSettings } from './services/settings';
+import { LOCAL_STORAGE_KEY, DEFAULT_TRAITS, DEFAULT_SETTINGS } from './constants';
 
 const App: React.FC = () => {
   // uploadedImage stores the raw file uploaded by the user (immutable source)
@@ -39,9 +42,21 @@ const App: React.FC = () => {
   // Scene Selection
   const [scene, setScene] = useState<string>('Original');
 
+  // Settings Panel State
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const lastGeneratedTraitsRef = useRef<string>(JSON.stringify(DEFAULT_TRAITS));
   
+  useEffect(() => {
+    // Load settings from localStorage on initial render
+    const loadedSettings = loadSettings();
+    if (loadedSettings) {
+      setSettings(loadedSettings);
+    }
+  }, []);
+
   const handleSelectKey = async () => {
     if ((window as any).aistudio) {
       await (window as any).aistudio.openSelectKey();
@@ -312,13 +327,25 @@ const App: React.FC = () => {
               OutfitGenie
             </h1>
           </div>
-          <div className="flex items-center gap-4 text-xs text-slate-400">
-             <span className="hidden sm:inline">Powered by Local AI</span>
+          <div className="flex items-center gap-4">
+             <span className="text-xs text-slate-400 hidden sm:inline">Powered by Local AI</span>
              <div className="h-4 w-[1px] bg-slate-700 hidden sm:block"></div>
-             <StatusIndicator settings={{ comfyUrl: import.meta.env.VITE_COMFY_API_URL || 'http://127.0.0.1:8188', lmStudioUrl: import.meta.env.VITE_LM_STUDIO_API_URL || 'http://localhost:1234/v1', useRefiner: false }} />
+             <StatusIndicator settings={settings} />
+             <button
+                onClick={() => setIsSettingsOpen(true)}
+                className="text-slate-400 hover:text-white transition-colors"
+                title="Settings"
+              >
+                <SettingsIcon />
+              </button>
           </div>
         </div>
       </header>
+
+      <SettingsPanel
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
 
       <main className="flex-1 max-w-[1920px] mx-auto w-full p-4 flex flex-col lg:flex-row gap-4 overflow-hidden">
         
