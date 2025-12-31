@@ -7,7 +7,7 @@ import { ZoomableImage } from './components/ZoomableImage';
 import { EyeIcon, EyeSlashIcon } from './components/Icons';
 import { BaseAppearance } from './components/BaseAppearance';
 import { PromptDesigner } from './components/PromptDesigner';
-import { ConnectionStatus } from './components/ConnectionStatus';
+import { StatusIndicator } from './components/StatusIndicator';
 import { LOCAL_STORAGE_KEY, DEFAULT_TRAITS } from './constants';
 
 const App: React.FC = () => {
@@ -302,7 +302,7 @@ const App: React.FC = () => {
 
   return (
     <div className="h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 selection:bg-indigo-500 selection:text-white flex flex-col overflow-hidden">
-      <ConnectionStatus settings={{ comfyUrl: import.meta.env.VITE_COMFY_API_URL || 'http://127.0.0.1:8188', lmStudioUrl: import.meta.env.VITE_LM_STUDIO_API_URL || 'http://localhost:1234/v1', useRefiner: false }} />
+
       {/* Header */}
       <header className="border-b border-slate-700 bg-slate-900/50 backdrop-blur-md flex-shrink-0 z-50">
         <div className="max-w-[1920px] mx-auto px-4 h-14 flex items-center justify-between">
@@ -312,8 +312,10 @@ const App: React.FC = () => {
               OutfitGenie
             </h1>
           </div>
-          <div className="flex items-center gap-4 text-xs text-slate-400 hidden sm:flex">
-             <span>Powered by Local AI</span>
+          <div className="flex items-center gap-4 text-xs text-slate-400">
+             <span className="hidden sm:inline">Powered by Local AI</span>
+             <div className="h-4 w-[1px] bg-slate-700 hidden sm:block"></div>
+             <StatusIndicator settings={{ comfyUrl: import.meta.env.VITE_COMFY_API_URL || 'http://127.0.0.1:8188', lmStudioUrl: import.meta.env.VITE_LM_STUDIO_API_URL || 'http://localhost:1234/v1', useRefiner: false }} />
           </div>
         </div>
       </header>
@@ -328,7 +330,7 @@ const App: React.FC = () => {
             
             {/* Original Image Card */}
             <div className="relative group bg-slate-800/50 rounded-xl border-2 border-dashed border-slate-600 hover:border-indigo-500/50 transition-colors flex flex-col items-center justify-center overflow-hidden h-full">
-              <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-medium text-white pointer-events-none z-10 uppercase tracking-wide">
+              <div className="absolute top-2 left-2 bg-slate-900/40 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-semibold text-white pointer-events-none z-10 uppercase tracking-wide border border-white/10 shadow-sm">
                 Original / Base
               </div>
               
@@ -396,7 +398,7 @@ const App: React.FC = () => {
 
             {/* Generated Image Card */}
             <div className="relative bg-slate-800/50 rounded-xl border border-slate-700 flex flex-col items-center justify-center overflow-hidden h-full group">
-              <div className="absolute top-2 left-2 bg-indigo-600/80 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-medium text-white z-10 pointer-events-none uppercase tracking-wide">
+              <div className="absolute top-2 left-2 bg-indigo-600/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-semibold text-white z-10 pointer-events-none uppercase tracking-wide shadow-sm shadow-indigo-500/20">
                 New Look
               </div>
 
