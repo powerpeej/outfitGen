@@ -1,13 +1,15 @@
 import { ComfyClient } from "./comfyClient";
 import { LmStudioClient } from "./lmStudioClient";
 import { CharacterTraits } from "../types";
+import { loadSettings } from './settings';
+import { DEFAULT_SETTINGS } from '../constants';
 
-// Configuration
-const COMFY_URL = import.meta.env.VITE_COMFY_API_URL || "http://127.0.0.1:8188";
-const LM_STUDIO_URL = import.meta.env.VITE_LM_STUDIO_API_URL || "http://localhost:1234/v1";
+// Since services are singletons, we load settings once at initialization.
+// The user must reload the page for new settings to take effect.
+const currentSettings = loadSettings() ?? DEFAULT_SETTINGS;
 
-const comfy = new ComfyClient(COMFY_URL);
-const lmStudio = new LmStudioClient(LM_STUDIO_URL);
+const comfy = new ComfyClient(currentSettings.comfyUrl);
+const lmStudio = new LmStudioClient(currentSettings.lmStudioUrl);
 
 // --- Helpers ---
 
