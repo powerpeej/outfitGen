@@ -1,78 +1,77 @@
-# OutfitGenie - Local AI Edition
+# OutfitGenie
 
-A React application for generating and customizing character outfits using local AI tools (**ComfyUI** and **LM Studio**). This project uses the powerful **Z-Image Turbo** model for high-efficiency image generation.
+A modern web application for generating and managing outfits, powered by ComfyUI and local LLMs.
+
+**Hardware Optimized:** This project is specifically optimized for an **NVIDIA RTX 2070 (8GB VRAM)**. It uses **GGUF Quantized Models** to fit massive image generation models into limited VRAM.
+
+## Features
+
+- **Outfit Generation**: Create unique outfits using text prompts (Z-Image GGUF).
+- **Outfit Changing**: Seamlessly replace outfits in existing photos (Inpainting).
+- **Local AI Integration**:
+  - Uses **ComfyUI** for image generation.
+  - Uses **LM Studio** for text processing and descriptions.
+- **Responsive UI**: Built with React and Tailwind CSS for a seamless experience.
 
 ## Prerequisites
 
-To run this application, you need the following local AI services running:
+1.  **Node.js**: Install Node.js (v18 or higher recommended).
+2.  **ComfyUI**: Installed and running locally.
+    *   **Required Custom Node**: [ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF).
+3.  **LM Studio**: Installed and running locally.
+4.  **Python**: Required to run the model setup script.
 
-### 1. ComfyUI (Image Generation)
+## Setup
 
-You need a working installation of [ComfyUI](https://github.com/comfyanonymous/ComfyUI).
+### 1. Install Dependencies
+```bash
+npm install
+```
 
-**Required Models:**
-Download and place these models in your `ComfyUI/models/` directory structure as follows:
+### 2. Install Models (Automated)
+We have a script to automate the installation of the `ComfyUI-GGUF` node and the download of the required GGUF models (`z-image-turbo-q3_k_s.gguf`, `Qwen3-4B-Q4_K_M.gguf`, `ae.safetensors`).
 
-| File Name | Download Link | Target Directory |
-| :--- | :--- | :--- |
-| `z_image_turbo_bf16.safetensors` | [Download](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors) | `models/diffusion_models/` |
-| `qwen_3_4b.safetensors` | [Download](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors) | `models/text_encoders/` |
-| `ae.safetensors` | [Download](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors) | `models/vae/` |
-
-*Note: Ensure you are using a recent version of ComfyUI for Z-Image support.*
-
-**Setup:**
-1.  **Update ComfyUI:** Ensure your ComfyUI is updated to the latest version to support `ModelSamplingAuraFlow` (native in recent versions).
-2.  **Start Server:** Start ComfyUI (default: `http://127.0.0.1:8188`).
-3.  **Cross-Origin:** If running on a different machine or IP, ensure you run ComfyUI with `--listen` and potentially `--enable-cors-header *`.
-
-### 2. LM Studio (Text & Vision)
-
-You need [LM Studio](https://lmstudio.ai/) for prompt enhancement and image analysis.
-
-**Recommended Models:**
-*   **For Prompt Enhancement (Text):**
-    *   [Meta Llama 3 8B Instruct](https://huggingface.co/lmstudio-community/Meta-Llama-3-8B-Instruct-GGUF) - Excellent general purpose instruction following.
-*   **For Image Analysis (Vision):**
-    *   [MiniCPM-V 2.6](https://huggingface.co/lmstudio-community/MiniCPM-V-2_6-GGUF) - State-of-the-art efficiency for vision tasks (Requires LM Studio 0.3.0+).
-    *   [LLaVA Llama 3 8B](https://huggingface.co/xtuner/llava-llama-3-8b-v1_1-gguf) - Strong alternative based on Llama 3.
-
-**Setup:**
-1.  **Load Model:** Search for and download one of the recommended models above within LM Studio.
-2.  **Start Server:** Start the Local Server in LM Studio (default: `http://localhost:1234`).
-3.  **CORS (Important):** You **MUST** enable "CORS" in the LM Studio server settings (right sidebar) to allow the web app to communicate with it.
-
-## Installation & Running
-
-1.  **Install Dependencies:**
+1.  Open `scripts/setup_models.py` and verify/edit the `COMFY_PATH` to point to your local ComfyUI installation.
+2.  Run the script:
     ```bash
-    npm install
+    python scripts/setup_models.py
     ```
 
-2.  **Configuration:**
-    Create a `.env.local` file in the root directory to point to your local services if they differ from defaults:
+### 3. Environment Configuration
+Create a `.env.local` file in the root directory and add your API endpoints:
+```env
+VITE_COMFY_API_URL=http://127.0.0.1:8188
+VITE_LM_STUDIO_API_URL=http://localhost:1234
+```
 
-    ```env
-    # Default ComfyUI URL
-    VITE_COMFY_API_URL=http://127.0.0.1:8188
+### 4. LM Studio Configuration
+To prevent the LLM from stealing VRAM needed for image generation:
+*   **GPU Offload**: Set to **"Split"** or reduce until stable.
+*   **Recommendation**: Run models like `Llama 3.1 8B Instruct (Q4_K_M)` mostly in **System RAM** to leave VRAM for ComfyUI.
 
-    # Default LM Studio URL (ensure /v1 is included)
-    VITE_LM_STUDIO_API_URL=http://localhost:1234/v1
-    ```
+### 5. Run Development Server
+```bash
+npm run dev
+```
 
-3.  **Run the App:**
-    ```bash
-    npm run dev
-    ```
+## Usage
 
-## How It Works
+1.  Start **ComfyUI**.
+2.  Start **LM Studio** (Server mode enabled).
+3.  Open the application in your browser (usually `http://localhost:3000`).
+4.  **Text-to-Image**: Generates a full image from a text prompt.
+5.  **Image-to-Image**: Uploads an image and a mask to change specific parts (e.g., the outfit).
 
-*   **Base Model Generation:** Uses the `Z-Image Turbo` Text-to-Image workflow (`z_image_t2i_api.json`) to create a character based on selected traits.
-*   **Outfit Change:** Uses the `Z-Image Turbo` Image-to-Image workflow (`z_image_i2i_api.json`) to redraw the outfit while preserving the character pose and composition.
-*   **Prompt Enhancement:** Sends your simple description to LM Studio to generate a detailed prompt.
+## Project Structure
 
-## Troubleshooting
+The project uses a flat directory structure in the root:
 
-*   **CORS Errors:** Ensure LM Studio server has CORS enabled. For ComfyUI, if accessing from a different device, check startup arguments.
-*   **"Model not found" in ComfyUI:** Verify you placed the `.safetensors` files in the exact directories listed above.
-*   **Generation Failed:** Check the ComfyUI console window for error messages. If a node is red, you might be missing a model or need to update ComfyUI.
+- `App.tsx`: Main application component.
+- `components/`: React UI components.
+- `services/`: API services and settings.
+- `scripts/`: Utility scripts (e.g., model setup).
+- `public/`: Static assets and ComfyUI workflow templates (`.json`).
+
+## License
+
+[License Information]
