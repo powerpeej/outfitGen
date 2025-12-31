@@ -4,11 +4,12 @@ import { OutfitPreset, GenerationStatus, SavedOutfit, CharacterTraits } from './
 import { Button } from './components/Button';
 import { Spinner } from './components/Spinner';
 import { ZoomableImage } from './components/ZoomableImage';
-import { EyeIcon, EyeSlashIcon, SettingsIcon } from './components/Icons';
+import { EyeIcon, EyeSlashIcon, SettingsIcon, GalleryIcon } from './components/Icons';
 import { BaseAppearance } from './components/BaseAppearance';
 import { PromptDesigner } from './components/PromptDesigner';
 import { StatusIndicator } from './components/StatusIndicator';
 import { SettingsPanel } from './components/SettingsPanel';
+import { ImageGallery } from './components/ImageGallery';
 import { AppSettings } from './services/settings';
 import { loadSettings } from './services/settings';
 import { LOCAL_STORAGE_KEY, DEFAULT_TRAITS, DEFAULT_SETTINGS } from './constants';
@@ -45,6 +46,9 @@ const App: React.FC = () => {
   // Settings Panel State
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+
+  // Gallery Panel State
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const lastGeneratedTraitsRef = useRef<string>(JSON.stringify(DEFAULT_TRAITS));
@@ -332,6 +336,13 @@ const App: React.FC = () => {
              <div className="h-4 w-[1px] bg-slate-700 hidden sm:block"></div>
              <StatusIndicator settings={settings} />
              <button
+                onClick={() => setIsGalleryOpen(true)}
+                className="text-slate-400 hover:text-white transition-colors"
+                title="Gallery"
+              >
+                <GalleryIcon />
+              </button>
+             <button
                 onClick={() => setIsSettingsOpen(true)}
                 className="text-slate-400 hover:text-white transition-colors"
                 title="Settings"
@@ -345,6 +356,11 @@ const App: React.FC = () => {
       <SettingsPanel
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      <ImageGallery
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
       />
 
       <main className="flex-1 max-w-[1920px] mx-auto w-full p-4 flex flex-col lg:flex-row gap-4 overflow-hidden">
