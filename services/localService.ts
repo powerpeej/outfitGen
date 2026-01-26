@@ -91,10 +91,12 @@ export const generateOutfitChange = async (
   base64Image: string,
   outfitDescription: string,
   traits: CharacterTraits,
-  scene: string = 'Original'
+  scene: string = 'Original',
+  mask: string | null = null,
 ): Promise<string> => {
-    // 1. Upload the source image
-    const imageName = await comfy.uploadImage(base64Image);
+    // 1. Upload the source image (and mask if it exists)
+    const imageName = await comfy.uploadImage(base64Image, "input_image.png");
+    const maskName = mask ? await comfy.uploadImage(mask, "mask_image.png", true) : null;
 
     // 2. Load the I2I Workflow API Template
     const response = await fetch('/workflows/z_image_i2i_gguf_api.json');
@@ -108,10 +110,14 @@ export const generateOutfitChange = async (
     // 4. Inject into Workflow
     const safePrompt = JSON.stringify(promptText).slice(1, -1);
 
-    const workflowString = workflowTemplate
+    let workflowString = workflowTemplate
         .replace('"%POSITIVE_PROMPT%"', `"${safePrompt}"`)
         .replace('"%INPUT_IMAGE%"', `"${imageName}"`)
         .replace('"%SEED%"', String(seed));
+
+    if (maskName) {
+        workflowString = workflowString.replace('"%MASK_IMAGE%"', `"${maskName}"`);
+    }
 
     const workflow = JSON.parse(workflowString);
 

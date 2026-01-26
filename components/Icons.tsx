@@ -31,3 +31,11 @@ export const SettingsIcon = () => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
   </svg>
 );
+
+export const MaskIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.4 4.6a2 2 0 012.828 0L24 6.414l-2.828 2.828-1.414-1.414L19.4 4.6z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 14.5A4.5 4.5 0 018.5 10H14a5 5 0 015 5v5H4v-5.5z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.5 20a4.5 4.5 0 110-9 4.5 4.5 0 010 9z" />
+    </svg>
+);
