@@ -87,6 +87,7 @@
   "10": {
     "inputs": {
       "image": "%INPUT_IMAGE%",
+      "channel": "RGB",
       "upload": "image"
     },
     "class_type": "LoadImage",
@@ -117,8 +118,8 @@
         0
       ],
       "mask": [
-        "10",
-        1
+        "32",
+        0
       ],
       "grow_mask_by": 6
     },
@@ -154,6 +155,16 @@
     "class_type": "VAELoader",
     "_meta": {
       "title": "VAE Loader"
+    }
+  },
+  "32": {
+    "inputs": {
+      "image": "%MASK_IMAGE%",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Mask Image"
     }
   }
 }

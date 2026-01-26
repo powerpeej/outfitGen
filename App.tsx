@@ -4,12 +4,13 @@ import { OutfitPreset, GenerationStatus, SavedOutfit, CharacterTraits } from './
 import { Button } from './components/Button';
 import { Spinner } from './components/Spinner';
 import { ZoomableImage } from './components/ZoomableImage';
-import { EyeIcon, EyeSlashIcon, SettingsIcon, GalleryIcon } from './components/Icons';
+import { EyeIcon, EyeSlashIcon, SettingsIcon, GalleryIcon, MaskIcon } from './components/Icons';
 import { BaseAppearance } from './components/BaseAppearance';
 import { PromptDesigner } from './components/PromptDesigner';
 import { StatusIndicator } from './components/StatusIndicator';
 import { SettingsPanel } from './components/SettingsPanel';
 import { ImageGallery } from './components/ImageGallery';
+import { MaskEditor } from './components/MaskEditor';
 import { AppSettings } from './services/settings';
 import { loadSettings } from './services/settings';
 import { LOCAL_STORAGE_KEY, DEFAULT_TRAITS, DEFAULT_SETTINGS } from './constants';
@@ -49,6 +50,10 @@ const App: React.FC = () => {
 
   // Gallery Panel State
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+
+  // Mask Editor State
+  const [isMaskEditorOpen, setIsMaskEditorOpen] = useState(false);
+  const [maskImage, setMaskImage] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const lastGeneratedTraitsRef = useRef<string>(JSON.stringify(DEFAULT_TRAITS));
@@ -158,6 +163,10 @@ const App: React.FC = () => {
       setErrorMsg("Please describe the outfit.");
       return;
     }
+    if (!maskImage) {
+      setErrorMsg("Please create a mask for the outfit change.");
+      return;
+    }
 
     setStatus(GenerationStatus.LOADING);
     setErrorMsg(null);
@@ -166,7 +175,7 @@ const App: React.FC = () => {
     setShowGenerated(true); // Ensure visible
 
     try {
-      const resultBase64 = await generateOutfitChange(originalImage, prompt, traits, scene);
+      const resultBase64 = await generateOutfitChange(originalImage, prompt, traits, scene, maskImage);
       setGeneratedImage(resultBase64);
       setStatus(GenerationStatus.SUCCESS);
     } catch (err: any) {
@@ -363,6 +372,17 @@ const App: React.FC = () => {
         onClose={() => setIsGalleryOpen(false)}
       />
 
+      {isMaskEditorOpen && originalImage && (
+        <MaskEditor
+          imageUrl={originalImage}
+          onCancel={() => setIsMaskEditorOpen(false)}
+          onSave={(maskData) => {
+            setMaskImage(maskData);
+            setIsMaskEditorOpen(false);
+          }}
+        />
+      )}
+
       <main className="flex-1 max-w-[1920px] mx-auto w-full p-4 flex flex-col lg:flex-row gap-4 overflow-hidden">
         
         {/* Left Column: Image Area & Wardrobe */}
@@ -379,6 +399,15 @@ const App: React.FC = () => {
               
               {/* Controls */}
               <div className="absolute top-2 right-2 z-30 flex gap-2">
+                {originalImage && (
+                    <button
+                        onClick={() => setIsMaskEditorOpen(true)}
+                        className="bg-black/40 hover:bg-indigo-600 text-white p-1.5 rounded-lg backdrop-blur-sm transition-all border border-white/10"
+                        title="Edit Mask"
+                    >
+                        <MaskIcon />
+                    </button>
+                )}
                 <button 
                   onClick={() => setShowOriginal(!showOriginal)}
                   className="bg-black/40 hover:bg-slate-700 text-white p-1.5 rounded-lg backdrop-blur-sm transition-all border border-white/10"
@@ -387,6 +416,12 @@ const App: React.FC = () => {
                   {showOriginal ? <EyeIcon /> : <EyeSlashIcon />}
                 </button>
               </div>
+
+              {maskImage && (
+                <div className="absolute top-10 left-2 bg-green-500/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-semibold text-white pointer-events-none z-10 uppercase tracking-wide border border-white/10 shadow-sm">
+                    Mask Applied
+                </div>
+              )}
 
               {originalImage ? (
                 <>
